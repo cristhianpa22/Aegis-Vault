@@ -26,12 +26,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        useMaterial3: true,
-        colorScheme: .fromSeed(
-          seedColor: Colors.green,
-         brightness: Brightness.dark),
-        
-      ),
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: .fromSeed(
+            seedColor: Colors.green,
+            brightness: Brightness.dark),
+          
+        ),
       
     );
   }

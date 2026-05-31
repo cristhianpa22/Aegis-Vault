@@ -30,16 +30,7 @@ class SupabaseService {
         .toList();
   }
 
-  static Future<Safehouse?> getSafehouseById(String id) async {
-    final response = await client
-        .from(_safehousesTable)
-        .select()
-        .eq('id', id)
-        .maybeSingle();
-
-    if (response == null) return null;
-    return Safehouse.fromJson(response);
-  }
+  
 
   
 

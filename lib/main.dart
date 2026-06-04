@@ -15,7 +15,7 @@ void main() async{
     final safehouses = await SupabaseService.getSafehouses();
     print('Conexion OK: ${safehouses.length} registros');
   }catch(e){
-    print('Error Supabase: ${e}');
+    print('Error Supabase: $e');
   }
   runApp( MyApp());
 }

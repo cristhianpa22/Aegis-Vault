@@ -9,7 +9,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: 'lib/.env');
   await SupabaseService.initialize();
-  
+
   List<Safehouse> safehousesCargados = [];
 
   try {

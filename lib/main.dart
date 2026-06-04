@@ -13,6 +13,13 @@ void main() async{
   await dotenv.load(fileName: 'lib/.env');
 
   await SupabaseService.initialize();
+<<<<<<< 
+  try{
+    final safehouses = await SupabaseService.getSafehouses();
+    print('Conexion OK: ${safehouses.length} registros');
+  }catch(e){
+    print('Error Supabase: $e');
+=======
 
   List<Safehouse> safehousesCargados = [];
 
@@ -21,6 +28,7 @@ void main() async{
     print('Conexion OK: ${safehousesCargados.length} registros');
   } catch (e) {
     print('Error Supabase: ${e}');
+>>>>>>> main
   }
   runApp(MyApp(safehouses: safehousesCargados));
 }

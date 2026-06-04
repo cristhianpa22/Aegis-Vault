@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
@@ -47,7 +48,30 @@ class ProtocolService {
     }
   }
 
-  void proximityCheck() {
+  void proximityCheck() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      debugPrint('El GPS físico está apagado en los ajustes del celular.');
+      return;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        debugPrint('El usuario rechazó el permiso de ubicación de nuevo.');
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      debugPrint('Permisos bloqueados permanentemente desde los ajustes.');
+      return;
+    }
+
     Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
@@ -63,7 +87,14 @@ class ProtocolService {
 
       if (distance <= 100) {
         if (await Vibration.hasVibrator() ?? false) {
-          Vibration.vibrate(pattern: [0, 100, 200, 100], repeat: -1);
+          Vibration.vibrate(
+            pattern: [0, 400, 150, 400],
+            intensities: [0, 255, 0, 255],
+            repeat: 0,
+          );
+          Timer(const Duration(seconds: 5), () {
+            Vibration.cancel();
+          });
         }
       } else {
         Vibration.cancel();

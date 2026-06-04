@@ -18,6 +18,7 @@ class _SafehouseScreenState extends State<SafehouseScreen> {
   void initState() {
     super.initState();
     _initLoading();
+    _protocolService.proximityCheck();
   }
 
   void _initLoading() {
@@ -51,10 +52,7 @@ class _SafehouseScreenState extends State<SafehouseScreen> {
         backgroundColor: const Color(0xFF05070B),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(2),
-          child: Container(
-            color: theme.colorScheme.primary,
-            height: 2,
-          ),
+          child: Container(color: theme.colorScheme.primary, height: 2),
         ),
       ),
       body: RefreshIndicator(
@@ -72,38 +70,53 @@ class _SafehouseScreenState extends State<SafehouseScreen> {
               );
             }
 
-            final result = snapshot.data ?? {'data': <Safehouse>[], 'isOffline': true};
-            final List<Safehouse> safehouses = result['data'] as List<Safehouse>;
+            final result =
+                snapshot.data ?? {'data': <Safehouse>[], 'isOffline': true};
+            final List<Safehouse> safehouses =
+                result['data'] as List<Safehouse>;
             final bool isOffline = result['isOffline'] as bool;
 
             return Column(
               children: [
                 if (isOffline)
-                  Container(
-                    width: double.infinity,
-                    color: theme.colorScheme.error,
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.wifi_off_rounded, color: Colors.white, size: 20),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            'MODO DESCONECTADO - DATOS LOCALES PROTEGIDOS',
-                            style: GoogleFonts.shareTechMono(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
-                              letterSpacing: 1.2,
-                            ),
-                            textAlign: TextAlign.center,
+                  Semantics(
+                    label:
+                        'Alerta del sistema: Modo desconectado. Mostrando datos locales protegidos.',
+                    container: true,
+                    liveRegion: true,
+                    child: Container(
+                      width: double.infinity,
+                      color: theme.colorScheme.error,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 16,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.wifi_off_rounded,
+                            color: Colors.white,
+                            size: 20,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'MODO DESCONECTADO - DATOS LOCALES PROTEGIDOS',
+                              style: GoogleFonts.shareTechMono(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                                letterSpacing: 1.2,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                
+
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -111,8 +124,11 @@ class _SafehouseScreenState extends State<SafehouseScreen> {
                         ? ListView(
                             physics: const AlwaysScrollableScrollPhysics(),
                             children: [
-                              SizedBox(height: MediaQuery.of(context).size.height * 0.3),
-                              Center(
+                              SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.3,
+                              ),
+                              const Center(
                                 child: Text(
                                   'NO SE ENCONTRARON REGISTROS',
                                   style: TextStyle(color: Colors.white),
@@ -122,15 +138,18 @@ class _SafehouseScreenState extends State<SafehouseScreen> {
                           )
                         : GridView.builder(
                             physics: const AlwaysScrollableScrollPhysics(),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 14,
-                              mainAxisSpacing: 14,
-                              childAspectRatio: 0.8,
-                            ),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 14,
+                                  mainAxisSpacing: 14,
+                                  childAspectRatio: 0.8,
+                                ),
                             itemCount: safehouses.length,
                             itemBuilder: (context, index) {
-                              return SafehouseCard(safehouse: safehouses[index]);
+                              return SafehouseCard(
+                                safehouse: safehouses[index],
+                              );
                             },
                           ),
                   ),
@@ -153,74 +172,136 @@ class SafehouseCard extends StatelessWidget {
     final theme = Theme.of(context);
     final isCompromised = safehouse.isCompromised;
 
-    final cardColor = isCompromised ? theme.colorScheme.errorContainer : theme.cardColor;
-    final accentColor = isCompromised ? theme.colorScheme.error : theme.colorScheme.primary;
+    final cardColor = isCompromised
+        ? theme.colorScheme.errorContainer
+        : theme.cardColor;
+    final accentColor = isCompromised
+        ? theme.colorScheme.error
+        : theme.colorScheme.primary;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: accentColor, width: isCompromised ? 2.5 : 1.5),
-        boxShadow: [BoxShadow(color: accentColor, blurRadius: isCompromised ? 12 : 6)],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(isCompromised ? Icons.gpp_bad_outlined : Icons.gpp_good_outlined, color: accentColor, size: 22),
-                const SizedBox(width: 6),
-                Expanded(
+    return Semantics(
+      container: true,
+      label:
+          'Refugio ${safehouse.codename}, ubicado en el sector ${safehouse.sector}, capacidad para ${safehouse.capacity} agentes. Su estado: ${isCompromised ? "Esta comprometido o bajo peligro" : "Esta seguro"}.',
+      excludeSemantics: true,
+      child: Container(
+        decoration: BoxDecoration(
+          color: cardColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: accentColor,
+            width: isCompromised ? 2.5 : 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(color: accentColor, blurRadius: isCompromised ? 12 : 6),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    isCompromised
+                        ? Icons.gpp_bad_outlined
+                        : Icons.gpp_good_outlined,
+                    color: accentColor,
+                    size: 22,
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      safehouse.codename.toUpperCase(),
+                      style: GoogleFonts.orbitron(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: isCompromised
+                            ? theme.colorScheme.onErrorContainer
+                            : Colors.white,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Container(height: 1, color: accentColor),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Icon(
+                    Icons.layers_outlined,
+                    size: 14,
+                    color: theme.colorScheme.secondary,
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'SEC: ${safehouse.sector}',
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  Icon(
+                    Icons.hourglass_empty,
+                    size: 14,
+                    color: theme.colorScheme.secondary,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'CAP: ${safehouse.capacity} AGTS',
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  const Icon(Icons.g_mobiledata, size: 14, color: Colors.white),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'LOC: ${safehouse.latitude}, ${safehouse.longitude}',
+                      style: const TextStyle(color: Colors.white, fontSize: 10),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Center(
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  decoration: BoxDecoration(
+                    color: isCompromised
+                        ? theme.colorScheme.error
+                        : theme.colorScheme.secondary,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                   child: Text(
-                    safehouse.codename.toUpperCase(),
-                    style: GoogleFonts.orbitron(fontWeight: FontWeight.bold, fontSize: 14, color: isCompromised ? theme.colorScheme.onErrorContainer : Colors.white),
-                    overflow: TextOverflow.ellipsis,
+                    isCompromised ? 'BREACH / COMPROMISED' : 'STATUS: SECURE',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.5,
+                      color: isCompromised
+                          ? Colors.white
+                          : theme.colorScheme.primary,
+                    ),
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Container(height: 1, color: accentColor),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Icon(Icons.layers_outlined, size: 14, color: theme.colorScheme.secondary),
-                const SizedBox(width: 6),
-                Expanded(child: Text('SEC: ${safehouse.sector}', style: TextStyle(color: Colors.white, fontSize: 12), overflow: TextOverflow.ellipsis)),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                Icon(Icons.hourglass_empty, size: 14, color: theme.colorScheme.secondary),
-                const SizedBox(width: 6),
-                Text('CAP: ${safehouse.capacity} AGTS', style: TextStyle(color: Colors.white, fontSize: 12)),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                Icon(Icons.g_mobiledata, size: 14, color: Colors.white),
-                const SizedBox(width: 6),
-                Expanded(child: Text('LOC: ${safehouse.latitude}, ${safehouse.longitude}', style: TextStyle(color: Colors.white, fontSize: 10), overflow: TextOverflow.ellipsis)),
-              ],
-            ),
-            const Spacer(),
-            Center(
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                decoration: BoxDecoration(color: isCompromised ? theme.colorScheme.error : theme.colorScheme.secondary, borderRadius: BorderRadius.circular(4)),
-                child: Text(
-                  isCompromised ? 'BREACH / COMPROMISED' : 'STATUS: SECURE',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: isCompromised ? Colors.white : theme.colorScheme.primary),
-                ),
               ),
-            )
-          ],
+            ],
+          ),
         ),
       ),
     );

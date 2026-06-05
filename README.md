@@ -1,17 +1,42 @@
-# aegis_vault
+# Aegis Vault
 
-A new Flutter project.
+Aplicación Flutter para gestionar safehouses (casas seguras). Se conecta a Supabase para consultar y administrar la información almacenada en la base de datos.
 
-## Getting Started
+## Requisitos
 
-This project is a starting point for a Flutter application.
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) (Dart ^3.12.0)
+- Cuenta y proyecto en [Supabase](https://supabase.com)
 
-A few resources to get you started if this is your first Flutter project:
+## Instalación
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+1. Clona el repositorio:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+git clone https://github.com/cristhianpa22/Aegis-Vault.git
+cd Aegis-Vault
+```
+
+2. Instala las dependencias:
+
+```bash
+flutter pub get
+```
+
+3. Configura las variables de entorno. Copia el archivo de ejemplo y completa tus credenciales de Supabase:
+
+```bash
+cp lib/.env.example lib/.env
+```
+
+Edita `lib/.env` con tu URL y tu clave **anon** (public):
+
+```env
+supabaseUrl=https://tu-proyecto.supabase.co
+apiKey=tu_clave_anon
+```
+
+4. Ejecuta la aplicación:
+
+```bash
+flutter run
+```
